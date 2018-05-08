@@ -4,13 +4,16 @@ import sys
 import gym
 import numpy as np
 
-from es import ES
+from es import ES, CMA_ES
 
-POP_SIZE = 16 # Number of solutions in each generation
+POP_SIZE = 2 # Number of solutions in each generation
 STDDEV = 1.0
 FITNESS_GOAL = 195
 NUM_WORKERS = POP_SIZE
 N_ROLLOUTS_PER_TRIAL = 100
+
+#solver = ES(pop_size=POP_SIZE, n_dim=250, stddev=1.0)
+solver = CMA_ES(pop_size=POP_SIZE, n_dim=250, init_stddev=1.0)
 
 class Controller:
     def __init__(self, parameters, input_dim=4, hidden_units=50, output_dim=1):
@@ -36,7 +39,7 @@ def rollouts(agent, env, n=N_ROLLOUTS_PER_TRIAL):
         while not done:
             a = agent.get_action(obs)
             obs, reward, done, info = env.step(a)
-            env.render()
+            #env.render()
             total_reward += reward
             t += 1
 
@@ -54,7 +57,6 @@ def start_work(env, solution):
 
 
 def train():
-    solver = ES(pop_size=POP_SIZE, n_dim=250, stddev=1.0)
     envs = [gym.make('CartPole-v0')
             for _ in range(NUM_WORKERS)]
 
